@@ -19,6 +19,8 @@ When it comes to making simple prototypes (or, “whiteboxing”), Blender is bo
 
 For architectural designs you also need more precise measurements and shapes that neither of these apps are equipped to deal with.
 
+Combined with my other addon [Capsule](https://github.com/Takanu/Capsule), you can export your level designs to the game engine of your choice with a single click.
+
 ## Credits
 • Maebbie for the original grid script and startup file and for additional feedback.
 
