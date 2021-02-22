@@ -25,7 +25,7 @@ bl_info = {
     "author": "Takanu (thanks to Maebbie for the original code).",
     "version": (1, 0, 0),
     "blender": (2, 91, 0),
-    "location": "3D View > Properties",
+    "location": "3D View > Sidebar > View > Grids",
     "wiki_url": "https://github.com/Takanu/Whitebox",
     "description": "Simple tools and assets for developing 3D level prototypes.",
     "tracker_url": "",
