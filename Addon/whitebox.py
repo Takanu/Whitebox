@@ -118,7 +118,7 @@ def add_hotkeys():
 
     ### Quick Walk Navigation Shortcut (prevents users from having to fish it out the keymap menu)
     km = kc.keymaps.new(name="3D View Generic", space_type='VIEW_3D', region_type='WINDOW')  
-    kmi = km.keymap_items.new("view3d.navigate",'RIGHTMOUSE', 'PRESS', shift=False, ctrl=False, alt=True)     
+    kmi = km.keymap_items.new("view3d.navigate",'LEFTMOUSE', 'CLICK', shift=False, ctrl=False, alt=True)     
     #kmi.properties.name = "bpy.ops.view3d.walk"  #not used for operators.         
     kmi.active = True
     addon_keymaps.append((km, kmi))
