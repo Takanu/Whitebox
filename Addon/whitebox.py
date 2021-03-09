@@ -25,7 +25,7 @@ bl_info = {
     "author": "Takanu (thanks to Maebbie for the original code).",
     "version": (1, 0, 0),
     "blender": (2, 91, 0),
-    "location": "3D View > Sidebar > View > Grids",
+    "location": "3D View > Properties",
     "wiki_url": "https://github.com/Takanu/Whitebox",
     "description": "Simple tools and assets for developing 3D level prototypes.",
     "tracker_url": "",
@@ -36,6 +36,8 @@ bl_info = {
 import bpy
 from bpy.types import Menu
 from bpy.types import Operator
+from bpy.props import IntProperty, FloatProperty
+
 import rna_keymap_ui
         
 # -----------------------------------------------------------------------------
@@ -161,13 +163,13 @@ def remove_hotkey():
 # -----------------------------------------------------------------------------
 #    Grid Size Adjuster      
 # -----------------------------------------------------------------------------     
-class GridSizePanel(bpy.types.Panel):
+class WhiteboxPanel(bpy.types.Panel):
     """Creates a Panel in the Object properties window"""
 
-    bl_label = "Grids"
+    bl_label = "Whitebox"
     bl_idname = "VIEW3D_PT_Grid_Options"
     bl_space_type = 'VIEW_3D'
-    bl_category = "View"
+    bl_category = "Whitebox"
     bl_region_type = 'UI'
     
 
@@ -175,9 +177,18 @@ class GridSizePanel(bpy.types.Panel):
         layout = self.layout
 
         overlay = bpy.context.space_data.overlay
+        scene = bpy.context.scene
 
-        row = layout.row()
+        row = layout.column(align=True)
+        row.label(text="Unit Options:")
+        row.separator()
         row.prop(overlay, "grid_scale")
+        row.separator()
+
+        row.label(text="Material Options:")
+        row.separator()
+        row.prop(scene, "whitebox_grid_opacity")
+        row.prop(scene, "whitebox_emission_strength")
 
 
 class WHITEBOX_OT_Increase_Grid_Size(Operator):
@@ -208,9 +219,43 @@ class WHITEBOX_OT_Decrease_Grid_Size(Operator):
 
         return {'FINISHED'}
 
+# -----------------------------------------------------------------------------
+#    Material Modifications  
+# -----------------------------------------------------------------------------     
+
+def WHITEBOX_Update_GridOpacity(self, context):
+    """Updates the grid opacity when the Scene.whitebox_grid_opacity property is changed."""
+
+    value = context.scene.whitebox_grid_opacity
+
+    for k,v in bpy.data.node_groups.items():
+        if k == 'Whitebox Diffuse Mix':
+            
+            diffuse = bpy.data.node_groups['Whitebox Diffuse Mix']
+            
+            for k,v in diffuse.nodes.items():
+                if k == 'Global Grid Alpha':
+                    diffuse.nodes['Global Grid Alpha'].inputs[1].default_value = value
+
+def WHITEBOX_Update_EmissionStrength(self, context):
+    """Updates the grid opacity when the Scene.whitebox_grid_opacity property is changed."""
+
+    value = context.scene.whitebox_emission_strength
+
+    for k,v in bpy.data.node_groups.items():
+        if k == 'Whitebox Emission Mix':
+            
+            emission = bpy.data.node_groups['Whitebox Emission Mix']
+        
+            for k,v in emission.nodes.items():
+                if k == 'Global Emission Strength':
+                    emission.nodes['Global Emission Strength'].inputs[1].default_value = value
+    
+
+
 classes = (
     AddonPreferences, 
-    GridSizePanel, 
+    WhiteboxPanel, 
     WHITEBOX_OT_Increase_Grid_Size, 
     WHITEBOX_OT_Decrease_Grid_Size,
 )
@@ -223,6 +268,24 @@ def register():
     from bpy.utils import register_class
     for cls in classes:
         register_class(cls)
+    
+    bpy.types.Scene.whitebox_grid_opacity = FloatProperty(
+        name="Grid Opacity",
+        description="Controls the opacity of the Whitebox grid overlay on all default Whitebox materials and any Material using the Whitebox Diffuse Mix or Whitebox Material Mix NodeGroups.",
+        min=0.0,
+        max=1.0,
+        default=1.0,
+        update=WHITEBOX_Update_GridOpacity,
+    )
+
+    bpy.types.Scene.whitebox_emission_strength = FloatProperty(
+        name="Grid Emission Strength",
+        description="Controls the emission strength of the Whitebox grid overlay on all default Whitebox materials and any Material using the Whitebox Emission Mix or Whitebox Material Mix NodeGroups.",
+        min=0.0,
+        soft_max=10.0,
+        default=1.0,
+        update=WHITEBOX_Update_EmissionStrength,
+    )
 
     # hotkey setup
     add_hotkeys()
@@ -232,6 +295,9 @@ def unregister():
 
     # hotkey cleanup
     remove_hotkey()
+
+    del bpy.types.Scene.whitebox_emission_strength
+    del bpy.types.Scene.whitebox_grid_opacity
 
     for cls in reversed(classes):
         unregister_class(cls)
