@@ -236,6 +236,19 @@ def WHITEBOX_Update_GridOpacity(self, context):
             for k,v in diffuse.nodes.items():
                 if k == 'Global Grid Alpha':
                     diffuse.nodes['Global Grid Alpha'].inputs[1].default_value = value
+            
+            emission = bpy.data.node_groups['Whitebox Emission Mix']
+
+            for k,v in emission.nodes.items():
+                if k == 'Global Grid Alpha':
+                    emission.nodes['Global Grid Alpha'].inputs[1].default_value = value
+            
+            alpha = bpy.data.node_groups['Whitebox Alpha Mix']
+
+            for k,v in alpha.nodes.items():
+                if k == 'Global Grid Alpha':
+                    alpha.nodes['Global Grid Alpha'].inputs[1].default_value = value
+            
 
 def WHITEBOX_Update_EmissionStrength(self, context):
     """Updates the grid opacity when the Scene.whitebox_grid_opacity property is changed."""
@@ -274,7 +287,7 @@ def register():
         description="Controls the opacity of the Whitebox grid overlay on all default Whitebox materials and any Material using the Whitebox Diffuse Mix or Whitebox Material Mix NodeGroups.",
         min=0.0,
         max=1.0,
-        default=1.0,
+        default=0.7,
         update=WHITEBOX_Update_GridOpacity,
     )
 
@@ -283,7 +296,7 @@ def register():
         description="Controls the emission strength of the Whitebox grid overlay on all default Whitebox materials and any Material using the Whitebox Emission Mix or Whitebox Material Mix NodeGroups.",
         min=0.0,
         soft_max=10.0,
-        default=1.0,
+        default=0.0,
         update=WHITEBOX_Update_EmissionStrength,
     )
 
