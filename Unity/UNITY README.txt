@@ -1,0 +1,1 @@
+To use the Unity component of Whitebox, simply drag this folder into your Unity project.  It includes additional shaders, prefabs and reference models.
